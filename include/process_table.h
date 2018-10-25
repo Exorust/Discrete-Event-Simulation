@@ -11,13 +11,13 @@ int cpu_burst;
 int wait_time;
 char* scheduling_policy;
 int time_quantum;
-bool preemption;
+int preemption;
 // add other fields which you feel are necessary
 } Process;
 
 typedef struct Process_Table_t {
-  int num_of_processes;
-  Process* process_array[MAX_SIZE_PROCESS_TABLE];   //Contains pointers to the respective process
+  int current_size; // Total number of processes in the array
+  Process* proc_arr[MAX_SIZE_PROCESS_TABLE];   //Contains pointers to the respective process
 } Process_Table;
 
 #endif

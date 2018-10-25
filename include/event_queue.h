@@ -10,7 +10,7 @@ double time; // time units since the start of the simulation
 } Event;
 
 typedef struct Event_Queue_t {
-  int current_size;
+  int current_size; //Starts from 0, filled will be current_size-1
   Event* heap[MAX_SIZE_EVENT_QUEUE]; //Array of pointers to the event queue array
 } Event_Queue;
 
