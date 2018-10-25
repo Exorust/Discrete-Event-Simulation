@@ -4,10 +4,12 @@
 #include <string.h>
 #include <assert.h>
 
-Process* process_initialize() {
+Process* process_initialize(int arrt,int burst) {
   //Values to set to when making a process
   Process* p = (Process*)malloc(sizeof(Process));
   p->pid = -1;
+  p->arrival_time = arrt;
+  p->cpu_burst = burst;
 }
 
 Process_Table* process_table_initialize() {

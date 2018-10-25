@@ -12,6 +12,7 @@ Event* event_initialize(double inp_time) {
 
 Event_Queue* event_queue_initialize() {
   Event_Queue* e = (Event_Queue*)malloc(sizeof(Event_Queue));
+  int i;
   for(i=0;i<MAX_SIZE_EVENT_QUEUE;i++) {
     e->heap[i] = NULL;
   }
