@@ -26,5 +26,53 @@ int main(int argc, char const *argv[]) {
   printf("Input sim type: \n1.First Come First Serve (FCFS) \n2.Multilevel Feedback Queue\n");
   scanf("%d",&sim_type);
 
+  switch (sim_type) {
+    case 1: {
+      //FCFS case
+      // rq-> Ready Queue & pt -> Process Table
+      Ready_Queue_FCFS* rq = ready_queue_FCFS_initialize();
+      Process_Table* pt = process_table_initialize();
+      int i;
+      for(i=0;i<pt_input->current_size;i++) {
+        if((pt_input->proc_arr)[i]->arrival_time <= CPUtime) {
+          Process* p = process_table_pop(pt_input,i);
+          Event* e = event_initialize(CPUtime,p);
+          ready_queue_FCFS_push(rq,e);
+        }
+      }
+      while(ready_queue_FCFS_size(rq) != 0){
+        for(i=0;i<pt_input->current_size;i++) {
+          if((pt_input->proc_arr)[i]->arrival_time <= CPUtime) {
+            Process* p = process_table_pop(pt_input,i);
+            Event* e = event_initialize(CPUtime,p);
+            ready_queue_FCFS_push(rq,e);
+          }
+          // The event that is first in the queue
+          Event* e = ready_queue_FCFS_pop(rq);
+          switch (e->type) {
+            case EARRIVAL: {
+              
+            }
+            case ECPUBURSTCOMPLETION: {
+
+            }
+            case ETIMEREXPIRED: {
+
+            }
+
+          }
+
+        }
+      }
+
+    }
+    case 2: {
+
+    }
+    default: {
+      printf("ERROR\n" );
+    }
+  }
+
   return 0;
 }

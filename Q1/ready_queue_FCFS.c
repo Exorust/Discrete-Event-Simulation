@@ -71,6 +71,10 @@ Event* ready_queue_FCFS_top(Ready_Queue_FCFS* e) {
   return ev;
 }
 
+int ready_queue_FCFS_size(Ready_Queue_FCFS* e) {
+  return e->current_size;
+}
+
 // //If needed implement DELETE
 // void ready_queue_FCFS_delete(Ready_Queue_FCFS* e, Event* ev) {
 //   assert(e->current_size >0);
