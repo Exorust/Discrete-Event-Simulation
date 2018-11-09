@@ -1,11 +1,20 @@
+#include "event.h"
+#include "ready_queue_FCFS.h"
+
 #ifndef PROCESS_TABLE
 #define PROCESS_TABLE
 
 #define MAX_SIZE_PROCESS_TABLE 1024
 
+//TODO Add more states?
+typedef enum Process_Type_t {
+  PREADY,
+  PRUNNING
+}Process_Type;
+
 typedef struct Process {
 int pid;
-char state;
+Process_Type state;
 int arrival_time;
 int cpu_burst;
 int wait_time;
@@ -22,11 +31,14 @@ typedef struct Process_Table_t {
 
 //Function Declarations
 Process* process_initialize(int,int);
+Process* process_table_pop(Process_Table* ,int );
+void process_print(Process *);
+
 Process_Table* process_table_initialize();
 int process_table_full(Process_Table*);
 void process_table_add(Process_Table*,Process*);
 void process_table_deletevp(Process_Table* ,Process*);
 void process_table_delete(Process_Table*,int);
-Process* process_table_pop(Process_Table* ,int );
+
 
 #endif

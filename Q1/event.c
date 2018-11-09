@@ -1,5 +1,5 @@
 #include "include/event.h"
-#include "process_table.h"
+#include "include/process_table.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,4 +16,27 @@ Event* event_initialize(int inp_time, Process* p) {
   e->time = inp_time;
   e->p = p;
   return e;
+}
+void print_event(Event* e) {
+  printf("Type: ");
+  switch(e->type) {
+    case EDEFAULT: {
+      printf("EDEFAULT\n");
+      break;
+    }
+    case EARRIVAL: {
+      printf("EARRIVAL\n");
+      break;
+    }
+    case ECPUBURSTCOMPLETION: {
+      printf("ECPUBURSTCOMPLETION\n");
+      break;
+    }
+    case ETIMEREXPIRED: {
+      printf("ECPUBURSTCOMPLETION\n");
+      break;
+    }
+  }
+  printf("Time of arrival: %d\n", e->time );
+  print_process(e->p);
 }

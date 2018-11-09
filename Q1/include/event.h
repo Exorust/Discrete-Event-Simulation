@@ -1,10 +1,11 @@
 #include "process_table.h"
+#include "ready_queue_FCFS.h"
 
 #ifndef EVENT
 #define EVENT
 
-
 typedef enum Event_Type_t {
+  EDEFAULT,
   EARRIVAL,
   ECPUBURSTCOMPLETION,
   ETIMEREXPIRED
@@ -19,5 +20,6 @@ typedef struct Event_t {
 //Function Declarations
 Event* event_initialize(int);
 Event* event_initialize(int,Process*);
+void print_event(Event* );
 
 #endif

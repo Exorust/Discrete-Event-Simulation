@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define IDLE -1
+
 int main(int argc, char const *argv[]) {
   int CPU; // Contains the value of the running process
   FILE * fp;
@@ -21,6 +23,7 @@ int main(int argc, char const *argv[]) {
 
   //TIME FOR THE SIM
   int CPUtime=0;
+  int CPU = -1;
   //Type of simulation 1-> FCFS 2->MFQ
   int sim_type = 0;
   printf("Input sim type: \n1.First Come First Serve (FCFS) \n2.Multilevel Feedback Queue\n");
@@ -50,14 +53,32 @@ int main(int argc, char const *argv[]) {
           // The event that is first in the queue
           Event* e = ready_queue_FCFS_pop(rq);
           switch (e->type) {
+            case EDEFAULT: {
+              print_event(e);
+              break;
+            }
             case EARRIVAL: {
-              
+              if(CPU == IDLE ) {
+                //Idle run it
+                
+              }
+              else {
+                //Not idle add to ready_queue
+
+              }
+              break;
             }
             case ECPUBURSTCOMPLETION: {
 
+              break;
             }
             case ETIMEREXPIRED: {
 
+              break;
+            }
+            default {
+              //Incase of failure
+              abort(void);
             }
 
           }
@@ -65,12 +86,17 @@ int main(int argc, char const *argv[]) {
         }
       }
 
+      break;
     }
     case 2: {
+      // Multilevel Feedback Queue
 
+      break;
     }
     default: {
       printf("ERROR\n" );
+      abort(void);
+      break;
     }
   }
 
