@@ -27,6 +27,6 @@ int process_table_full(Process_Table*);
 void process_table_add(Process_Table*,Process*);
 void process_table_deletevp(Process_Table* ,Process*);
 void process_table_delete(Process_Table*,int);
-
+Process* process_table_pop(Process_Table* ,int );
 
 #endif
