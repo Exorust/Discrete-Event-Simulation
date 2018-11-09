@@ -2,6 +2,7 @@
 #include<stdlib.h>
 #include<string.h>
 #include<unistd.h>
+#include<limits.h>
 #include<semaphore.h>
 #include<pthread.h>
 
@@ -9,6 +10,12 @@
 #define true 1
 #define false 0
 #define bool int
+#define A 0
+#define B 1
+#define C 2
+#define D 3
+
+
 
 // Process Resources
 // 1        A, B, C
@@ -62,382 +69,277 @@ long long thresholds[4] = {0};
 pthread_mutex_t mutexForProcesses;
 pthread_mutex_t mutexBetweenOsAndProcess;
 
-/* 
-    Two layered structure for processes:
-    --------------------------------------
-    first layer: mutex for selecting a processes,
-    second layer: mutex for acquiring a resource between the OS thread and the process
-    Expected invariant: OS waits until it a process terminates
 
+/* 
+    mutex based solution:
+    ---------------------
+    The solution is an extension to the dining philosopher problem where both forks are necessarily picked up 
+    to eat. 
+    1. Exactly one process at a time is allowed from the 8*k process requesting.
+    2. It uses a system inspired by malloc and free functions where the functions resAlloc and resRelease 
+        are used to allocate and reclaim resources with the corresponding probabilities. 
+    3. If it can't find the resource it needs, it exits because there is a resource underflow.
 */
 
-// bitwise operators for collection of resources: A,B,C,D,E.
+// bitwise operators for collection of resources: A,B,C,D,E. NOT NEEDED APPARENTLY, just quit program saying resource underflow
 
-void os_function(void* args){
-    // sleep(2);
 
-    // Process Resources
-    // 1        A, B, C
-    // 2        B, C, D
-    // 3        A, C, D
-    // 4        A, B, D
-    // 5        A
-    // 6        B
-    // 7        C
-    // 8        D
+bool resAlloc(int neededA,int neededB, int neededC, int neededD){
 
+    if(neededA == true && resource_qantity[A] > 0){
+        resource_qantity[A]--;
+    }
+    else if(resource_qantity[A] <= 0){
+        return A;
+    }
+    if(neededB == true && resource_qantity[B] > 0){
+        resource_qantity[B]--;
+    }
+    else if(resource_qantity[B] <= 0){
+        return B;
+    }
+    if(neededC == true && resource_qantity[C] > 0){
+        resource_qantity[C]--;
+    }
+    else if(resource_qantity[C] <= 0){
+        return C;
+    }
+    if(neededD == true && resource_qantity[D] > 0){
+        resource_qantity[D]--;
+    }
+    else if(resource_qantity[D] <= 0){
+        return D;
+    }
+    return INT_MAX;
+}
+
+bool resRelease(int releaseA,int releaseB, int releaseC, int releaseD){
     // Resource Probability of Collection
     // A            2/3
     // B            3/4
     // C            3/5
     // D            2/3
-    
-    puts("\n\nwaiting....");
-    while(processFinishedCount <= 8*k){
-        pthread_mutex_lock(&mutexBetweenOsAndProcess);
-            puts("checking laude ");
-            processFinishedCount++;
-        // pop each process from the finishedProcesses array
-        if(finishedProcessInstance[0] > 0){
-            long long randomNumberA = (long long)rand();
-            long long randomNumberB = (long long)rand();
-            long long randomNumberC = (long long)rand();
-            printf(" number %lld\n",randomNumber);
-            if (randomNumberA < thresholds[0]){}
-            if (randomNumberB < thresholds[1]){}
-            if (randomNumberC < thresholds[2]){}
-        }
-        if(finishedProcessInstance[1] > 0){
-            long long randomNumberB = (long long)rand();
-            long long randomNumberC = (long long)rand();
-            long long randomNumberD = (long long)rand();
-            printf(" number %lld\n",randomNumber);
-            if (randomNumberB < thresholds[2]){}
-            if (randomNumberC < thresholds[2]){}
-            if (randomNumberD < thresholds[2]){}
-        }
-        if(finishedProcessInstance[2] > 0){
-            long long randomNumber = (long long)rand();
-            printf(" number %lld\n",randomNumber);
-        }
-        if(finishedProcessInstance[3] > 0){
-            long long randomNumber = (long long)rand();
-            printf(" number %lld\n",randomNumber);
-        }
-        if(finishedProcessInstance[4] > 0){
-            long long randomNumber = (long long)rand();
-            printf(" number %lld\n",randomNumber);
-        }
-        if(finishedProcessInstance[5] > 0){
-            long long randomNumber = (long long)rand();
-            printf(" number %lld\n",randomNumber);
-        }
-        if(finishedProcessInstance[6] > 0){
-            long long randomNumber = (long long)rand();
-            printf(" number %lld\n",randomNumber);
-        }
-        if(finishedProcessInstance[7] > 0){
-            long long randomNumber = (long long)rand();
-            printf(" number %lld\n",randomNumber);
-        }
+    int randA,randB,randC,randD;
+    randA = rand();
+    randB = rand();
+    randC = rand();
+    randD = rand();
 
-        pthread_mutex_unlock(&mutexBetweenOsAndProcess);
+    if(releaseA && randA < thresholds[A]){
+        resource_qantity[A]++;
+        puts("A collected");
     }
-    puts("\n\nkhatam laude");
-    pthread_mutex_unlock(&mutexBetweenOsAndProcess);
-    int  res = pthread_yield();
+    if(releaseB && randB < thresholds[B]){
+        resource_qantity[B]++;
+        puts("B collected");
+    }
+    if(releaseC && randC < thresholds[C]){
+        resource_qantity[C]++;
+        puts("C collected");
+    }
+    if(releaseD && randD < thresholds[D]){
+        resource_qantity[D]++;
+        puts("D collected");
+    }
+    return true;
 }
 
 void thread_funciton(void* process){
-        int processNumber = *(int*)process;
-        int res;
-    pthread_yield();
-// 1        A, B, C
-// 2        B, C, D
-// 3        A, C, D
-// 4        A, B, D
-// 5        A
-// 6        B
-// 7        C
-// 8        D
-        // printf("proc %d\n",processNumber);
-        switch(processNumber){
 
-            case 0:
-                while(1){
-                    pthread_mutex_lock(&mutexForProcesses);
-                    pthread_mutex_lock(&mutexBetweenOsAndProcess);
-                    // puts("lite 1");
-                    if(resource_qantity[0] >= 1 && resource_qantity[1] >= 1 && resource_qantity[2] >= 1){
-                        puts("\nmil gaya 1");
-                        finishedProcesses[0][finishedProcessInstance[0]++] = 0;
-                        resource_qantity[0]--;
-                        resource_qantity[1]--;
-                        resource_qantity[2]--;
-                        processFinishedCount++;
-                        pthread_mutex_unlock(&mutexBetweenOsAndProcess);
-                        pthread_mutex_unlock(&mutexForProcesses);
-                        break;
-                    }
+    int processType = *((int*)process);
 
-                    else{
-                        // puts("\nnahi mila\n"); 
-                        pthread_mutex_unlock(&mutexBetweenOsAndProcess);
-                        pthread_mutex_unlock(&mutexForProcesses);
-                        res = pthread_yield(); 
-                        // break;
-                    }
-
-                    // res = pthread_yield();
-                    // printf("res %d ",res);
-                    // pthread_exit(0);
-                }
-                puts("not lite 1");
-
-            break;
+    switch(processType){
+        case 0:
+        while(1){
+            pthread_mutex_lock(&mutexForProcesses);
+            // pthread_mutex_lock(&mutexBetweenOsAndProcess);
+            printf("Process Entered: %d\n",processType+1);
+            int res = resAlloc(true,true,true,false);
+            if(res  == INT_MAX){
+                printf("finished %d\n",processType+1);
+                int hasReleased = resRelease(true,true,true,false);
+                // pthread_mutex_unlock(&mutexBetweenOsAndProcess);
+                pthread_mutex_unlock(&mutexForProcesses);
+                pthread_exit(0);
+            }
+            else{
+                char resourceUnderflow[] = "ABCD";
+                printf("Resource Underflow Process %d %c\n",processType,resourceUnderflow[res]);
+                exit(0);
+            }
             
-            case 1:
-                while(1){
-                    pthread_mutex_lock(&mutexForProcesses);
-                    pthread_mutex_lock(&mutexBetweenOsAndProcess);
-                    // puts("lite 2");
-                    processFinishedCount++;
-                    // sleep(2);
-                    if(resource_qantity[1] > 1 && resource_qantity[2] > 1 && resource_qantity[3] > 1){
-                            puts("\nmil gaya 2\n");
-                            finishedProcesses[1][finishedProcessInstance[1]++] = 0;
-                            resource_qantity[1]--;
-                            resource_qantity[2]--;
-                            resource_qantity[3]--;
-                            pthread_mutex_unlock(&mutexBetweenOsAndProcess);
-                            pthread_mutex_unlock(&mutexForProcesses);                            
-                            break;
-                        }
-
-                        else{
-                            // puts("nahi mila"); 
-                            pthread_mutex_unlock(&mutexBetweenOsAndProcess);
-                            pthread_mutex_unlock(&mutexForProcesses);
-                            res = pthread_yield(); 
-                            // // res = pthread_yield();
-                            // break;
-                        }
-                    // printf("res %d ",res);
-                    // pthread_exit(0);
-                }
-                puts("not lite 2");
-            break;
+        }
+        break;
+        
+        case 1:
+        while(1){
+            pthread_mutex_lock(&mutexForProcesses);
+            // pthread_mutex_lock(&mutexBetweenOsAndProcess);
+            printf("Process Entered: %d\n",processType+1);
+            int res = resAlloc(false,true,true,true);
+            if(res  == INT_MAX){
+                printf("finished %d\n",processType+1);
+                int hasReleased = resRelease(false,true,true,true);
+                // pthread_mutex_unlock(&mutexBetweenOsAndProcess);
+                pthread_mutex_unlock(&mutexForProcesses);
+                pthread_exit(0);
+            }
+            else{
+                char resourceUnderflow[] = "ABCD";
+                printf("Resource Underflow Process %d %c\n",processType,resourceUnderflow[res]);
+                exit(0);
+            }
             
-            case 2:
-                while(1){
-                    pthread_mutex_lock(&mutexForProcesses);
-                    pthread_mutex_lock(&mutexBetweenOsAndProcess);
-                    // puts("lite 3");
-                    processFinishedCount++;
-                    // sleep(3);
-                    if(resource_qantity[0] >= 1 && resource_qantity[2] >= 1 && resource_qantity[3] >= 1){
-                        puts("\nmil gaya 3\n");
-                        resource_qantity[0]--;
-                        resource_qantity[2]--;
-                        resource_qantity[3]--;
-                        finishedProcesses[2][finishedProcessInstance[2]++] = 0;
-                        pthread_mutex_unlock(&mutexBetweenOsAndProcess);
-                        pthread_mutex_unlock(&mutexForProcesses);
-                        // res = pthread_yield();
-                        break;
-                    }
+        }
 
-                    else{
-                        // puts("\nnahi mila\n"); 
-                        pthread_mutex_unlock(&mutexBetweenOsAndProcess);
-                        pthread_mutex_unlock(&mutexForProcesses);
-                        res = pthread_yield(); 
-                        // break;
-                    }
-                    // printf("res %d ",res);
-                    // pthread_exit(0);
-                }
-                puts("not lite 3");
-                    
-            break;
+        break;
+        
+        case 2:
+        while(1){
+            pthread_mutex_lock(&mutexForProcesses);
+            // pthread_mutex_lock(&mutexBetweenOsAndProcess);
+            printf("Process Entered: %d\n",processType+1);
+            int res = resAlloc(true,false,true,true);
+            if(res  == INT_MAX){
+                printf("finished %d\n",processType+1);
+                int hasReleased = resRelease(true,false,true,true);
+                // pthread_mutex_unlock(&mutexBetweenOsAndProcess);
+                pthread_mutex_unlock(&mutexForProcesses);
+                pthread_exit(0);
+            }
+            else{
+                char resourceUnderflow[] = "ABCD";
+                printf("Resource Underflow Process %d %c\n",processType,resourceUnderflow[res]);
+                exit(0);
+            }
             
-            case 3:
-                while(1){
-                    pthread_mutex_lock(&mutexForProcesses);
-                    pthread_mutex_lock(&mutexBetweenOsAndProcess);
-                    // puts("lite 4");
-                    processFinishedCount++;
-                    // sleep(4);
-                    if(resource_qantity[0] >= 1 && resource_qantity[1] >= 1 && resource_qantity[3] >= 1){
-                        puts("\nmil gaya 4\n");
-                        finishedProcesses[3][finishedProcessInstance[3]++] = 0;
-                        resource_qantity[0]--;
-                        resource_qantity[1]--;
-                        resource_qantity[3]--;
-                        pthread_mutex_unlock(&mutexBetweenOsAndProcess);
-                        pthread_mutex_unlock(&mutexForProcesses);
-                        // res = pthread_yield();
-                        break;
-                    }
-
-                    else{
-                        // puts("\nnahi mila\n"); 
-                        pthread_mutex_unlock(&mutexBetweenOsAndProcess);
-                        pthread_mutex_unlock(&mutexForProcesses);
-                        res = pthread_yield(); 
-                        // break;
-                    }
-                    // printf("res %d ",res);
-                    // pthread_exit(0);
-                }
-                puts("not lite 4");
-                
-            break;
+        }
+        break;
+        
+        case 3:
+        while(1){
+            pthread_mutex_lock(&mutexForProcesses);
+            // pthread_mutex_lock(&mutexBetweenOsAndProcess);
+            printf("Process Entered: %d\n",processType+1);
+            int res = resAlloc(true,true,false,true);
+            if(res  == INT_MAX){
+                printf("finished %d\n",processType+1);
+                int hasReleased = resRelease(true,true,false,true);
+                // pthread_mutex_unlock(&mutexBetweenOsAndProcess);
+                pthread_mutex_unlock(&mutexForProcesses);
+                pthread_exit(0);
+            }
+            else{
+                char resourceUnderflow[] = "ABCD";
+                printf("Resource Underflow Process %d %c\n",processType,resourceUnderflow[res]);
+                exit(0);
+            }
             
-            case 4:
-                while(1){
-                    pthread_mutex_lock(&mutexForProcesses);
-                    pthread_mutex_lock(&mutexBetweenOsAndProcess);
-                    // puts("lite 5");
-                    processFinishedCount++;
-                    // sleep(5);
-                    if(resource_qantity[0] >= 1){
-                        puts("\nmil gaya 5 \n");
-                        resource_qantity[0]--;
-                        finishedProcesses[4][finishedProcessInstance[4]++] = 0;
-                        pthread_mutex_unlock(&mutexBetweenOsAndProcess);
-                        pthread_mutex_unlock(&mutexForProcesses);
-                        // res = pthread_yield();
-                        break;
-                    }
+        }
 
-                    else{
-                        // puts("\nnahi mila\n"); 
-                        pthread_mutex_unlock(&mutexBetweenOsAndProcess);
-                        pthread_mutex_unlock(&mutexForProcesses);
-                        res = pthread_yield(); 
-                        // break;
-                    }
-                    // printf("res %d ",res);
-                    // pthread_exit(0);
-                }
-                puts("not lite 5");
-                
-            break;
+        break;
+        
+        case 4:
+        while(1){
+            pthread_mutex_lock(&mutexForProcesses);
+            // pthread_mutex_lock(&mutexBetweenOsAndProcess);
+            printf("Process Entered: %d\n",processType+1);
+            int res = resAlloc(true,false,false,false);
+            if(res  == INT_MAX){
+                printf("finished proess %d\n",processType+1);
+                int hasReleased = resRelease(true,false,false,false);
+                // pthread_mutex_unlock(&mutexBetweenOsAndProcess);
+                pthread_mutex_unlock(&mutexForProcesses);
+                pthread_exit(0);
+            }
+            else{
+                char resourceUnderflow[] = "ABCD";
+                printf("Resource Underflow Process %d %c\n",processType,resourceUnderflow[res]);
+                exit(0);
+            }
             
-            case 5:
-                while(1){
-                    pthread_mutex_lock(&mutexForProcesses);
-                    pthread_mutex_lock(&mutexBetweenOsAndProcess);
-                    // puts("lite 6");
-                    processFinishedCount++;
-                    // sleep(4);
-                    if( resource_qantity[1] >= 1){
-                        puts("\nmil gaya 6\n");
-                        finishedProcesses[5][finishedProcessInstance[5]++] = 0;
-                        resource_qantity[1]--;
-                        pthread_mutex_unlock(&mutexBetweenOsAndProcess);
-                        pthread_mutex_unlock(&mutexForProcesses);
-                        // res = pthread_yield();
-                        break;
-                    }
-
-                    else{
-                        // puts("\nnahi mila\n"); 
-                        pthread_mutex_unlock(&mutexBetweenOsAndProcess);
-                        pthread_mutex_unlock(&mutexForProcesses);
-                        res = pthread_yield(); 
-                        // break;
-                    }
-                    
-                    // printf("res %d ",res);
-                    // pthread_exit(0);
-                }
-                puts("not lite 6");
-                
-            break;
+        }
+        break;
+        
+        case 5:
+        while(1){
+            pthread_mutex_lock(&mutexForProcesses);
+            // pthread_mutex_lock(&mutexBetweenOsAndProcess);
+            printf("Process Entered: %d\n",processType+1);
+            int res = resAlloc(false,true,false,false);
+            if(res  == INT_MAX){
+                printf("finished proess %d\n",processType+1);
+                int hasReleased = resRelease(false,true,false,false);
+                // pthread_mutex_unlock(&mutexBetweenOsAndProcess);
+                pthread_mutex_unlock(&mutexForProcesses);
+                pthread_exit(0);
+            }
+            else{
+                char resourceUnderflow[] = "ABCD";
+                printf("Resource Underflow Process %d %c\n",processType,resourceUnderflow[res]);
+                exit(0);
+            }
             
-            case 6:
-                while(1){
-                    pthread_mutex_lock(&mutexForProcesses);
-                    pthread_mutex_lock(&mutexBetweenOsAndProcess);
-                    // puts("lite 7");
-                    processFinishedCount++;
-                    // sleep(3);
-                    if(resource_qantity[2] >= 1){
-                        puts("\nmil gaya 7\n");
-                        resource_qantity[2]--;
-                        finishedProcesses[6][finishedProcessInstance[6]++] = 0;
-                        pthread_mutex_unlock(&mutexBetweenOsAndProcess);
-                        pthread_mutex_unlock(&mutexForProcesses);
-                        // res = pthread_yield();
-                        break;
-                    }
-
-                    else{
-                        // puts("\nnahi mila\n"); 
-                        pthread_mutex_unlock(&mutexBetweenOsAndProcess);
-                        pthread_mutex_unlock(&mutexForProcesses);
-                        res = pthread_yield();
-                        // break; 
-                    }
-                    
-                    // printf("res %d ",res);
-                    // pthread_exit(0);
-                }
-                puts("not lite 7");
-                
-            break;
+        }
+    
+        break;
+        
+        case 6:
+        while(1){
+            pthread_mutex_lock(&mutexForProcesses);
+            // pthread_mutex_lock(&mutexBetweenOsAndProcess);
+            printf("Process Entered: %d\n",processType+1);
+            int res = resAlloc(false,false,true,false);
+            if(res  == INT_MAX){
+                printf("finished proess %d\n",processType+1);
+                int hasReleased = resRelease(false,false,true,false);
+                // pthread_mutex_unlock(&mutexBetweenOsAndProcess);
+                pthread_mutex_unlock(&mutexForProcesses);
+                pthread_exit(0);
+            }
+            else{
+                char resourceUnderflow[] = "ABCD";
+                printf("Resource Underflow Process %d %c\n",processType,resourceUnderflow[res]);
+                exit(0);
+            }
             
-            case 7:
-                while(1){
-                    pthread_mutex_lock(&mutexForProcesses);
-                    pthread_mutex_lock(&mutexBetweenOsAndProcess);
-                    // puts("lite 8");
-                    processFinishedCount++;
-                    // sleep(2);
-                    if(resource_qantity[3] >= 1){
-                        puts("\nmil gaya 8\n");
-                        resource_qantity[3]--;
-                        finishedProcesses[7][finishedProcessInstance[7]++] = 0;
-                        pthread_mutex_unlock(&mutexBetweenOsAndProcess);
-                        pthread_mutex_unlock(&mutexForProcesses);
-                        // res = pthread_yield();    
-                        break;
-                    }
+        }
 
-                    else{
-                        // puts("\nnahi mila\n"); 
-                        pthread_mutex_unlock(&mutexBetweenOsAndProcess);
-                        pthread_mutex_unlock(&mutexForProcesses);
-                        res = pthread_yield(); 
-                        // break;
-                    }
-                    // printf("res %d ",res);
-                    // pthread_exit(0);
-                }
-                puts("not lite 8");
-
-            break;
-
-            default:
-            puts("Invalid process number found, exiting");
-            pthread_exit(0);
-        };
-        puts("thread finished");
-        // pthread_mutex_unlock(&mutexBetweenOsAndProcess);
-        pthread_exit(0);
-     
+        break;
+        
+        case 7:
+        while(1){
+            pthread_mutex_lock(&mutexForProcesses);
+            // pthread_mutex_lock(&mutexBetweenOsAndProcess);
+            printf("Process Entered: %d\n",processType+1);
+            int res = resAlloc(true,false,false,true);
+            if(res  == INT_MAX){
+                printf("finished proess %d\n",processType+1);
+                int hasReleased = resRelease(false,false,false,true);
+                // pthread_mutex_unlock(&mutexBetweenOsAndProcess);
+                pthread_mutex_unlock(&mutexForProcesses);
+                pthread_exit(0);
+            }
+            else{
+                char resourceUnderflow[] = "ABCD";
+                printf("Resource Underflow Process %d %c\n",processType,resourceUnderflow[res]);
+                exit(0);
+            }
+            
+        }
+        break;
+    }
 }
 
 int main(){
+    // random values threshold for 
     thresholds[0] = 2*(long long)(RAND_MAX/3);
     thresholds[1] = 3*(long long)(RAND_MAX/4);
     thresholds[2] = 3*(long long)(RAND_MAX/5);
     thresholds[3] = 2*(long long)(RAND_MAX/3);
     puts("enter k");
     scanf("%d",&k);
-    puts("enter resources");
+    puts("enter resources"); 
     int i,j;
     for(i = 0; i < 4; i++){
         scanf("%d",&resource_qantity[i]);
@@ -451,31 +353,22 @@ int main(){
         finishedProcesses[i] = malloc(k*sizeof(int));
         finishedProcessInstance[i] = 0;
     }
-    puts("lite");
+    // puts("lite");
     pthread_t processes[8*k],osThread;
+    int threadTypes[8*k];
 
     // create 8*k processes
     for(i = 0; i < k; i++)  
         for(j = 0; j < 8; j++){
-            printf("j: %d\n",j);
-            pthread_create(&processes[8*i + j],NULL,(void*)&thread_funciton,(void*)&j);
+            // printf("j: %d\n",j);
+            threadTypes[8*i + j] = j;
+            pthread_create(&processes[8*i + j],NULL,(void*)&thread_funciton,(void *)&threadTypes[8*i + j]);
         }
-
-    pthread_create(&osThread,NULL,(void*)&os_function,(void*)0);
-
-    for(i = 0; i < 8; i++){
-        for(j = 0; j < k; j++){
-            printf(" %d ",finishedProcesses[i][j]);
-        }
-        puts("");
-    }
 
     for(i = 0; i < k; i++)  
         for(j = 0; j < 8; j++){
             pthread_join(processes[8*i + j],NULL);
         }
-    pthread_join(osThread,NULL);
-
     puts("\n main thread exiting");
     return 0;
 }
