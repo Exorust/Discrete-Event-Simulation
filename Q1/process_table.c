@@ -54,6 +54,10 @@ Process* process_table_pop(Process_Table* pt,int pid) {
   assert(pid<MAX_SIZE_PROCESS_TABLE);
   Process *p = pt->proc_arr[pid];
   pt->proc_arr[pid] = NULL;
+  int i;
+  for(i=pid;i<pt->current_size;i++) {
+    pt->proc_arr[i] = pt->proc_arr[i+1];
+  }
   pt->current_size--;
   return p;
 }

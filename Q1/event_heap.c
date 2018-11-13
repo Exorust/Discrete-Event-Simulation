@@ -28,10 +28,10 @@ void event_heap_minheapify(Event_Heap* e, int i) {
   int right = 2*i+2;
   int n = e->current_size;
   int to_repeat = i;
-  if(left<=n-1 && e->heap[i]->time > e->heap[right]->time) {
+  if(left<=n-1 && e->heap[i]->time > e->heap[left]->time) {
     to_repeat = right;
   }
-  if(right<=n-1 && e->heap[i]->time > e->heap[left]->time) {
+  if(right<=n-1 && e->heap[i]->time > e->heap[right]->time) {
     to_repeat = left;
   }
   if(to_repeat != i) {

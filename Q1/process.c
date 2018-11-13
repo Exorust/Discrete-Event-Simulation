@@ -16,16 +16,18 @@ Process* process_initialize(int arrt,int burst) {
 
   p->time = arrt;
   p->cpu_burst = burst;
+  return p;
 }
 
 void process_print(Process* p) {
-  printf("Process Information\n");
-  printf("pid: %d", p->pid);
-  printf("state %c", p->state);
-  printf("arrival_time %d", p->time);
-  printf("cpu_burst: %d", p->cpu_burst);
-  printf("wait_time %d", p->wait_time);
-  printf("scheduling_policy %c", *(p->scheduling_policy));
-  printf("time_quantum: %d", p->time_quantum);
-  printf("preemption: %d",p->preemption);
+  printf("Process Information");
+  // printf("%d\n", p );
+  printf(" pid: %d", p->pid);
+  printf(" state %c", p->state);
+  printf(" arrival_time %d", p->time);
+  printf(" cpu_burst: %d", p->cpu_burst);
+  printf(" wait_time %d", p->wait_time);
+  // printf("scheduling_policy %c", *(p->scheduling_policy));
+  printf(" time_quantum: %d", p->time_quantum);
+  printf(" preemption: %d\n",p->preemption);
 }
