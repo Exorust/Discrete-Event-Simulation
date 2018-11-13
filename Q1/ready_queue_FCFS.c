@@ -19,7 +19,7 @@ Ready_Queue_FCFS* ready_queue_FCFS_initialize() {
 
 void ready_queue_FCFS_swap(Ready_Queue_FCFS* e, int i,int j) {
   //Swaps two processes in the event queue
-  Event* temp = e->heap[i];
+  Process* temp = e->heap[i];
   e->heap[i] = e->heap[j];
   e->heap[j] = temp;
 }
@@ -49,25 +49,25 @@ void ready_queue_FCFS_build_minheap (Ready_Queue_FCFS* e) {
   }
 }
 
-void ready_queue_FCFS_push(Ready_Queue_FCFS* e, Event* ev) {
+void ready_queue_FCFS_push(Ready_Queue_FCFS* e, Process* ev) {
   assert(e->current_size < MAX_SIZE_EVENT_QUEUE);
   e->heap[e->current_size] = ev;
   e->current_size++;
   ready_queue_FCFS_build_minheap(e);
 }
 
-Event* ready_queue_FCFS_pop(Ready_Queue_FCFS* e) {
+Process* ready_queue_FCFS_pop(Ready_Queue_FCFS* e) {
   assert(e->current_size >0);
   int n = e-> current_size;
   ready_queue_FCFS_swap(e,0,(n-1));
-  Event* ev = e->heap[n-1];
+  Process* ev = e->heap[n-1];
   e->heap[n-1] = NULL;
   ready_queue_FCFS_minheapify(e,0);
   return ev;
 }
 
-Event* ready_queue_FCFS_top(Ready_Queue_FCFS* e) {
-  Event* ev = e->heap[0];
+Process* ready_queue_FCFS_top(Ready_Queue_FCFS* e) {
+  Process* ev = e->heap[0];
   return ev;
 }
 
@@ -76,7 +76,7 @@ int ready_queue_FCFS_size(Ready_Queue_FCFS* e) {
 }
 
 // //If needed implement DELETE
-// void ready_queue_FCFS_delete(Ready_Queue_FCFS* e, Event* ev) {
+// void ready_queue_FCFS_delete(Ready_Queue_FCFS* e, Process* ev) {
 //   assert(e->current_size >0);
 //   e->heap[current_size] = ev;
 //   ready_queue_FCFS_build_minheap(e);

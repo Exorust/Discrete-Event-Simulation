@@ -1,8 +1,7 @@
-#include "process_table.h"
-#include "ready_queue_FCFS.h"
+#ifndef EVENT_HEADER
+#define EVENT_HEADER
 
-#ifndef EVENT
-#define EVENT
+#include "process.h"
 
 typedef enum Event_Type_t {
   EDEFAULT,
@@ -14,12 +13,13 @@ typedef enum Event_Type_t {
 typedef struct Event_t {
   Event_Type type;
   int time; // time units since the start of the simulation
-  Process* p  // to be used in Arrival situation
+  Process* p;  // to be used in Arrival situation
 } Event;
 
 //Function Declarations
 Event* event_initialize(int);
-Event* event_initialize(int,Process*);
+Event* event_initialize_process(int,Process*);
 void print_event(Event* );
+Process* delete_event(Event*);
 
 #endif
