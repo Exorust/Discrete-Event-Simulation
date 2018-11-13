@@ -40,17 +40,20 @@ void process_table_deletevp(Process_Table* pt,Process* p) {
   int pid = p->pid;
   free(pt->proc_arr[pid]);
   pt->proc_arr[pid] = NULL;
+  pt->current_size--;
 }
 void process_table_delete(Process_Table* pt,int pid) {
   //Deletes based on a given process id
   assert(pid<MAX_SIZE_PROCESS_TABLE);
   free(pt->proc_arr[pid]);
   pt->proc_arr[pid] = NULL;
+  pt->current_size--;
 }
 Process* process_table_pop(Process_Table* pt,int pid) {
   //Deletes based on a given process id
   assert(pid<MAX_SIZE_PROCESS_TABLE);
   Process *p = pt->proc_arr[pid]
   pt->proc_arr[pid] = NULL;
+  pt->current_size--;
   return p;
 }

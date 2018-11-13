@@ -13,12 +13,13 @@ int main(int argc, char const *argv[]) {
   int CPU; // Contains the value of the running process
   FILE * fp;
   fp = fopen("process.csv", "r");
-  int arrival_time,cpu_burst;
+  int time,cpu_burst;
   //Stores input times in pt_input
   Process_Table* pt_input = process_table_initialize();
+  Process_Table* pt = process_table_initialize();
   do {
-    fscanf(fp,"%d,%d", &arrival_time, &cpu_burst);
-    Process* p = process_initialize(arrival_time,cpu_burst);
+    fscanf(fp,"%d,%d", &time, &cpu_burst);
+    Process* p = process_initialize(time,cpu_burst);
     process_table_add(pt_input,p);
   } while(!feof(fp));
   fclose(fp);
@@ -35,22 +36,24 @@ int main(int argc, char const *argv[]) {
     case 1: {
       //FCFS case
       // rq-> Ready Queue & pt -> Process Table
+      Event_Heap* eh = event_heap_initialize();
       Ready_Queue_FCFS* rq = ready_queue_FCFS_initialize();
-      Process_Table* pt_final = process_table_initialize();
       int i;
       for(i=0;i<pt_input->current_size;i++) {
-        if((pt_input->proc_arr)[i]->arrival_time <= CPUtime) {
+        if((pt_input->proc_arr)[i]->time <= CPUtime) {
           Process* p = process_table_pop(pt_input,i);
           Event* e = event_initialize_process(CPUtime,p);
-          ready_queue_FCFS_push(rq,e);
+          e->type = EARRIVAL;
+          event_heap_push(eh,e);
         }
       }
-      while(ready_queue_FCFS_size(rq) != 0){
+      while(event_heap_size(eh) != 0){
         for(i=0;i<pt_input->current_size;i++) {
-          if((pt_input->proc_arr)[i]->arrival_time <= CPUtime) {
+          if((pt_input->proc_arr)[i]->time <= CPUtime) {
             Process* p = process_table_pop(pt_input,i);
             Event* e = event_initialize_process(CPUtime,p);
-            ready_queue_FCFS_push(rq,e);
+            e->type = EARRIVAL;
+            event_heap_push(eh,e);
           }
         }
         // The event that is first in the queue
@@ -96,10 +99,9 @@ int main(int argc, char const *argv[]) {
       // Multilevel Feedback Queue
       Ready_Queue_FCFS* rq_f = ready_queue_FCFS_initialize();
       Ready_Queue_RR* rq_r = ready_queue_RR_initialize();
-      Process_Table* pt_final = process_table_initialize();
       int i;
       for(i=0;i<pt_input->current_size;i++) {
-        if((pt_input->proc_arr)[i]->arrival_time <= CPUtime) {
+        if((pt_input->proc_arr)[i]->time <= CPUtime) {
           Process* p = process_table_pop(pt_input,i);
           Event* e = event_initialize_process(CPUtime,p);
           //If less than 8 sec add to rr or else in fcfs
@@ -113,7 +115,7 @@ int main(int argc, char const *argv[]) {
       }
       while(ready_queue_FCFS_size(rq_f) != 0 && ready_queue_RR_size(rq_r) != 0){
         for(i=0;i<pt_input->current_size;i++) {
-          if((pt_input->proc_arr)[i]->arrival_time <= CPUtime) {
+          if((pt_input->proc_arr)[i]->time <= CPUtime) {
             Process* p = process_table_pop(pt_input,i);
             Event* e = event_initialize_process(CPUtime,p);
             //If less than 8 sec add to rr or else in fcfs
@@ -218,6 +220,17 @@ int main(int argc, char const *argv[]) {
       break;
     }
   }
+
+  sum = 0;
+  total = pt->current_size;
+  while(pt->current_size != 0) {
+      Process* p = process_table_pop(pt,0);
+      if(p != NULL) {
+        sum += p->wait_time
+      }
+  }
+  double awt = sum/total;
+  printf("\nAWT: %f\n", awt );
 
   return 0;
 }

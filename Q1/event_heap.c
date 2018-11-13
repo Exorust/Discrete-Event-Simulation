@@ -9,7 +9,7 @@
 Event_Heap* event_heap_initialize() {
   Event_Heap* e = (Event_Heap*)malloc(sizeof(Event_Heap));
   int i;
-  for(i=0;i<MAX_SIZE_EVENT_QUEUE;i++) {
+  for(i=0;i<MAX_SIZE_EVENT_HEAP;i++) {
     e->heap[i] = NULL;
   }
   e->current_size = 0;
@@ -49,7 +49,7 @@ void event_heap_build_minheap (Event_Heap* e) {
 }
 
 void event_heap_push(Event_Heap* e, Event* ev) {
-  assert(e->current_size < MAX_SIZE_EVENT_QUEUE);
+  assert(e->current_size < MAX_SIZE_EVENT_HEAP);
   e->heap[e->current_size] = ev;
   e->current_size++;
   event_heap_build_minheap(e);

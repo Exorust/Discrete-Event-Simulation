@@ -7,17 +7,17 @@
 
 typedef struct Event_Heap_t {
   int current_size; //Starts from 0, filled will be current_size-1
-  Process* heap[MAX_SIZE_EVENT_QUEUE]; //Array of pointers to the event queue array
+  Event* heap[MAX_SIZE_EVENT_HEAP]; //Array of pointers to the event queue array
 } Event_Heap;
 
 //Function Declarations
-Event_Heap* ready_queue_initialize();
-void ready_queue_swap(Event_Heap* , int ,int );
-void ready_queue_minheapify(Event_Heap* , int );
-void ready_queue_build_minheap (Event_Heap* );
-void ready_queue_push(Event_Heap* , Event* );
-Event* ready_queue_pop(Event_Heap* );
-Event* ready_queue_top(Event_Heap* );
-int ready_queue_size(Event_Heap*);
+Event_Heap* event_heap_initialize();
+void event_heap_swap(Event_Heap* , int ,int );
+void event_heap_minheapify(Event_Heap* , int );
+void event_heap_build_minheap (Event_Heap* );
+void event_heap_push(Event_Heap* , Event* );
+Event* event_heap_pop(Event_Heap* );
+Event* event_heap_top(Event_Heap* );
+int event_heap_size(Event_Heap*);
 
 #endif

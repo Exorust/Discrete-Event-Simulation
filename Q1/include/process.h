@@ -12,7 +12,7 @@ typedef enum Process_Type_t {
 typedef struct Process_t {
 int pid;
 Process_Type state;
-int arrival_time;
+int time;
 int cpu_burst;
 int wait_time;
 char* scheduling_policy;

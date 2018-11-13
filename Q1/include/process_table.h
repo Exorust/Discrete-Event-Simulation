@@ -3,7 +3,7 @@
 
 #include "process.h"
 
-#define MAX_SIZE_PROCESS_TABLE 1024
+#define MAX_SIZE_PROCESS_TABLE 4096
 
 typedef struct Process_Table_t {
   int current_size; // Total number of processes in the array
