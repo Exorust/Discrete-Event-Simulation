@@ -11,7 +11,7 @@ Event* event_initialize(int inp_time) {
   e->p = NULL;
   return e;
 }
-Event* event_initialize(int inp_time, Process* p) {
+Event* event_initialize_process(int inp_time, Process* p) {
   Event* e = (Event*)malloc(sizeof(Event));
   e->time = inp_time;
   e->p = p;
@@ -39,4 +39,10 @@ void print_event(Event* e) {
   }
   printf("Time of arrival: %d\n", e->time );
   print_process(e->p);
+}
+
+Process* delete_event(Event* e) {
+  Process* p = e->p;
+  free(e);
+  return p;
 }
