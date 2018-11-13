@@ -60,10 +60,14 @@ int main(int argc, char const *argv[]) {
         }
       }
       while(event_heap_size(eh) != 0){
+        printf("Size of Process_Table %d\n", pt_input->current_size );
         for(i=0;i<pt_input->current_size;i++) {
           if((pt_input->proc_arr)[i]->time <= CPUtime) {
             Process* p = process_table_pop(pt_input,i);
             Event* e = event_initialize_process(CPUtime,p);
+            printf("ADDDING\n" );
+            print_event(e);
+            printf("==================\n" );
             e->type = EARRIVAL;
             event_heap_push(eh,e);
           }
@@ -160,17 +164,22 @@ int main(int argc, char const *argv[]) {
               queue_now = RR;
               e->p->state = PREADY;
               ready_queue_RR_push(rq_r,e->p);
+              printf(">RR\n" );
             }
             else {
               //FCFS
               queue_now = FCFS;
               e->p->state = PREADY;
               ready_queue_FCFS_push(rq_f,e->p);
+              printf(">FCFS\n" );
             }
             if(CPU == IDLE) {
               if(ready_queue_RR_size(rq_r) != 0) {
                 //RR
+                printf("From RR\n" );
                 Process* p = ready_queue_RR_pop(rq_r);
+                process_print(p);
+                printf("Small\n" );
                 if(p->time <= QUANTUM) {
                   //Smaller than quantum
                   p->wait_time = p->wait_time + (CPUtime - p->time);
@@ -182,6 +191,7 @@ int main(int argc, char const *argv[]) {
                 }
                 else {
                   //1 QUANTUM
+                  printf("1 Quantum\n" );
                   p->wait_time = p->wait_time + (CPUtime - p->time);
                   CPUtime += QUANTUM;
                   p->state = PREADY;
@@ -193,7 +203,9 @@ int main(int argc, char const *argv[]) {
               }
               else if(ready_queue_RR_size(rq_r) == 0 && ready_queue_FCFS_size(rq_f) != 0) {
                 //FCFS
+                printf("From FCFS\n" );
                 Process* p = ready_queue_FCFS_pop(rq_f);
+                process_print(p);
                 p->wait_time = p->wait_time + (CPUtime - p->time);
                 CPUtime += p->cpu_burst;
                 p->state = PFINISH;
@@ -210,7 +222,9 @@ int main(int argc, char const *argv[]) {
             if(CPU == IDLE) {
               if(ready_queue_RR_size(rq_r) != 0) {
                 //RR
+                printf("From RR\n" );
                 Process* p = ready_queue_RR_pop(rq_r);
+                process_print(p);
                 if(p->time <= QUANTUM) {
                   //Smaller than quantum
                   p->wait_time = p->wait_time + (CPUtime - p->time);
@@ -222,6 +236,7 @@ int main(int argc, char const *argv[]) {
                 }
                 else {
                   //1 QUANTUM
+                  printf("1 Quantum\n" );
                   p->wait_time = p->wait_time + (CPUtime - p->time);
                   CPUtime += QUANTUM;
                   p->state = PREADY;
@@ -233,7 +248,9 @@ int main(int argc, char const *argv[]) {
               }
               else if(ready_queue_RR_size(rq_r) == 0 && ready_queue_FCFS_size(rq_f) != 0) {
                 //FCFS
+                printf("From FCFS\n" );
                 Process* p = ready_queue_FCFS_pop(rq_f);
+                process_print(p);
                 p->wait_time = e->p->wait_time + (CPUtime - p->time);
                 CPUtime += p->cpu_burst;
                 p->state = PFINISH;
@@ -268,6 +285,7 @@ int main(int argc, char const *argv[]) {
   while(pt->current_size != 0) {
       Process* p = process_table_pop(pt,0);
       if(p != NULL) {
+        printf("%d\n", p->wait_time );
         sum += p->wait_time;
       }
   }

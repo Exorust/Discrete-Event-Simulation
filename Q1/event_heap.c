@@ -20,9 +20,9 @@ void event_heap_swap(Event_Heap* e, int i,int j) {
   //Swaps two processes in the event queue
   Event* temp = e->heap[i];
   e->heap[i] = e->heap[j];
+  
   e->heap[j] = temp;
 }
-
 void event_heap_minheapify(Event_Heap* e, int i) {
   int left = 2*i+1;
   int right = 2*i+2;
