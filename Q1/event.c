@@ -17,6 +17,13 @@ Event* event_initialize_process(int inp_time, Process* p) {
   e->p = p;
   return e;
 }
+
+Event* event_initialize_wot_time(Process* p) {
+  Event* e = (Event*)malloc(sizeof(Event));
+  e->p = p;
+  return e;
+}
+
 void print_event(Event* e) {
   printf("Type: ");
   switch(e->type) {
@@ -38,7 +45,7 @@ void print_event(Event* e) {
     }
   }
   printf("Time of arrival: %d\n", e->time );
-  print_process(e->p);
+  process_print(e->p);
 }
 
 Process* delete_event(Event* e) {

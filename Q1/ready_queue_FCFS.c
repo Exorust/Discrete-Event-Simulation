@@ -1,16 +1,13 @@
 #include "include/ready_queue_FCFS.h"
-#include "include/event.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-
-
+// #include <assert.h>
 
 Ready_Queue_FCFS* ready_queue_FCFS_initialize() {
   Ready_Queue_FCFS* e = (Ready_Queue_FCFS*)malloc(sizeof(Ready_Queue_FCFS));
   int i;
-  for(i=0;i<MAX_SIZE_EVENT_QUEUE;i++) {
+  for(i=0;i<MAX_SIZE_READY_QUEUE_FCFS;i++) {
     e->heap[i] = NULL;
   }
   e->current_size = 0;
@@ -44,20 +41,20 @@ void ready_queue_FCFS_minheapify(Ready_Queue_FCFS* e, int i) {
 void ready_queue_FCFS_build_minheap (Ready_Queue_FCFS* e) {
   int i;
   int n = e->current_size;
-  for(i = n/2 ;i >= 1 ;i--){
+  for(i = n/2 ;i >= 1 ;i--) {
     ready_queue_FCFS_minheapify(e,i) ;
   }
 }
 
 void ready_queue_FCFS_push(Ready_Queue_FCFS* e, Process* ev) {
-  assert(e->current_size < MAX_SIZE_EVENT_QUEUE);
+  // assert(e->current_size < MAX_SIZE_READY_QUEUE_FCFS);
   e->heap[e->current_size] = ev;
   e->current_size++;
   ready_queue_FCFS_build_minheap(e);
 }
 
 Process* ready_queue_FCFS_pop(Ready_Queue_FCFS* e) {
-  assert(e->current_size >0);
+  // assert(e->current_size >0);
   int n = e-> current_size;
   ready_queue_FCFS_swap(e,0,(n-1));
   Process* ev = e->heap[n-1];

@@ -1,13 +1,13 @@
-#ifndef READY_QUEUE
-#define READY_QUEUE
+#ifndef READY_QUEUE_FCFS
+#define READY_QUEUE_FCFS
 
-#include "event.h"
+#include "process.h"
 
-#define MAX_SIZE_EVENT_QUEUE 1024
+#define MAX_SIZE_READY_QUEUE_FCFS 1024
 
 typedef struct Ready_Queue_FCFS_t {
   int current_size; //Starts from 0, filled will be current_size-1
-  Process* heap[MAX_SIZE_EVENT_QUEUE]; //Array of pointers to the event queue array
+  Process* heap[MAX_SIZE_READY_QUEUE_FCFS]; //Array of pointers to the event queue array
 } Ready_Queue_FCFS;
 
 //Function Declarations
@@ -18,6 +18,6 @@ void ready_queue_FCFS_build_minheap (Ready_Queue_FCFS* );
 void ready_queue_FCFS_push(Ready_Queue_FCFS* , Process* );
 Process* ready_queue_FCFS_pop(Ready_Queue_FCFS* );
 Process* ready_queue_FCFS_top(Ready_Queue_FCFS* );
-int ready_queue_FCFS_size(Ready_Queue_FCFS*);
+int ready_queue_FCFS_size(Ready_Queue_FCFS* );
 
 #endif

@@ -21,5 +21,6 @@ Event* event_initialize(int);
 Event* event_initialize_process(int,Process*);
 void print_event(Event* );
 Process* delete_event(Event*);
+Event* event_initialize_wot_time(Process* );
 
 #endif
