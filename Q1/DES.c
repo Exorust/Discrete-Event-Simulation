@@ -20,12 +20,15 @@ int main(int argc, char const *argv[]) {
   //Stores input times in pt_input
   Process_Table* pt_input = process_table_initialize();
   Process_Table* pt = process_table_initialize();
-  do {
-    fscanf(fp,"%d,%d", &time, &cpu_burst);
+  // int j = 0;
+  while(!feof(fp)) {
+    fscanf(fp,"%d,%d\n", &time, &cpu_burst);
     Process* p = process_initialize(time,cpu_burst);
     process_print(p);
     process_table_add(pt_input,p);
-  } while(!feof(fp));
+    // j++;
+  }
+  // printf("%d",j);
   fclose(fp);
   int i;
 
@@ -67,12 +70,14 @@ int main(int argc, char const *argv[]) {
         }
         // The event that is first in the queue
         Event* e = event_heap_pop(eh);
+        // printf("%d",e->type);
         switch (e->type) {
           case EDEFAULT: {
             print_event(e);
             break;
           }
           case EARRIVAL: {
+            print_event(e);
             process_table_add(pt,e->p);
             if(CPU == IDLE ) {
               //Idle run it
@@ -90,6 +95,7 @@ int main(int argc, char const *argv[]) {
             break;
           }
           case ECPUBURSTCOMPLETION: {
+            print_event(e);
             e->p->state = PFINISH;
             if(ready_queue_FCFS_size(rq) != 0) {
               Process* p = ready_queue_FCFS_pop(rq);
@@ -110,8 +116,8 @@ int main(int argc, char const *argv[]) {
             //Incase of failure
             abort();
           }
-          free(e);
         }
+        free(e);
       }
       break;
     }
@@ -146,6 +152,7 @@ int main(int argc, char const *argv[]) {
             break;
           }
           case EARRIVAL: {
+            print_event(e);
             int queue_now;
             process_table_add(pt,e->p);
             if(e->p->cpu_burst <= 8) {
@@ -198,6 +205,7 @@ int main(int argc, char const *argv[]) {
             break;
           }
           case ECPUBURSTCOMPLETION: {
+            print_event(e);
             e->p->state = PFINISH;
             if(CPU == IDLE) {
               if(ready_queue_RR_size(rq_r) != 0) {
@@ -237,6 +245,7 @@ int main(int argc, char const *argv[]) {
             break;
           }
           case ETIMEREXPIRED: {
+            print_event(e);
             e->p->state = PREADY;
             ready_queue_RR_push(rq_r,e->p);
             break;

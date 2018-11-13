@@ -44,8 +44,9 @@ void print_event(Event* e) {
       break;
     }
   }
-  printf("Time of arrival: %d\n", e->time );
+  printf("Time of Event: %d\n", e->time );
   process_print(e->p);
+  printf("\n");
 }
 
 Process* delete_event(Event* e) {
