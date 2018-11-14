@@ -149,22 +149,32 @@ int main(int argc, char const *argv[]) {
         }
       }
       while(event_heap_size(eh) != 0){
+        printf("\n\n----------Each LOOP------------\n\n" );
+        printf("Adding!! \n" );
         for(i=0;i<pt_input->current_size;i++) {
           if((pt_input->proc_arr)[i]->time <= CPUtime) {
             Process* p = process_table_pop(pt_input,i);
             Event* e = event_initialize_process(p->time,p);
             e->type = EARRIVAL;
+            printf("\n");
+            print_event(e);
             event_heap_push(eh,e);
           }
         }
+        printf("Finish Adding!! \n" );
         // The event that is first in the queue
         Event* e = event_heap_pop(eh);
+        printf("=========================\n" );
+        print_event(e);
+        printf("=========================\n" );
         switch (e->type) {
           case EDEFAULT: {
+            printf("default\n" );
             print_event(e);
             break;
           }
           case EARRIVAL: {
+            printf("earrival\n" );
             print_event(e);
             int queue_now;
             process_table_add(pt,e->p);
@@ -183,6 +193,8 @@ int main(int argc, char const *argv[]) {
               printf(">FCFS\n" );
             }
             if(CPU == IDLE) {
+              printf("EXEC*****\n" );
+              printf("CPUtime: %d\n", CPUtime );
               if(ready_queue_RR_size(rq_r) != 0) {
                 //RR
                 printf("From RR\n" );
@@ -191,22 +203,26 @@ int main(int argc, char const *argv[]) {
                 if(p->cpu_burst <= QUANTUM) {
                   //Smaller than quantum
                   printf("Small\n" );
-                  p->wait_time = p->wait_time + (CPUtime - p->time);
                   CPUtime += e->p->cpu_burst;
+                  p->wait_time = (CPUtime - p->time) - p->saved_burst;
                   p->state = PFINISH;
                   Event* en = event_initialize_process(CPUtime,p);
                   en->type = ECPUBURSTCOMPLETION;
+                  printf("After Completion less than 1q\n" );
+                  print_event(en);
                   event_heap_push(eh,en);
                 }
                 else {
                   //1 QUANTUM
                   printf("1 Quantum\n" );
-                  p->wait_time = p->wait_time + (CPUtime - p->time);
                   CPUtime += QUANTUM;
+                  p->wait_time = (CPUtime - p->time) - p->saved_burst;
                   p->state = PREADY;
                   p->cpu_burst -= QUANTUM;
                   Event* en = event_initialize_process(CPUtime,p);
                   en->type = ETIMEREXPIRED;
+                  printf("After Completion 1 quantum\n" );
+                  print_event(en);
                   event_heap_push(eh,en);
                 }
               }
@@ -217,78 +233,125 @@ int main(int argc, char const *argv[]) {
                 process_print(p);
                 p->wait_time = p->wait_time + (CPUtime - p->time);
                 CPUtime += p->cpu_burst;
+                p->cpu_burst = 0;
                 p->state = PFINISH;
-                Event* en = event_initialize_process(CPUtime,p);
-                en->type = ECPUBURSTCOMPLETION;
-                event_heap_push(eh,en);
+                if(p->cpu_burst != 0 ) {
+                  Event* en = event_initialize_process(CPUtime,p);
+                  en->type = ECPUBURSTCOMPLETION;
+                  printf("fcfs in cpub\n" );
+                  event_heap_push(eh,en);
+                  print_event(en);
+                }
               }
             }
+            printf("CPUtime: %d\n", CPUtime );
             break;
           }
           case ECPUBURSTCOMPLETION: {
+            printf("CPUBURST********\n" );
             print_event(e);
-            e->p->state = PFINISH;
-            if(CPU == IDLE) {
-              if(ready_queue_RR_size(rq_r) != 0) {
+            if(e->p->cpu_burst >= 0){
+              Process* ip = e->p;
+              process_print(ip);
+              int queue_now;
+              if(ip->saved_burst <= 8) {
                 //RR
-                printf("From RR\n" );
-                Process* p = ready_queue_RR_pop(rq_r);
-                process_print(p);
-                if(p->cpu_burst <= QUANTUM) {
-                  //Smaller than quantum
+                queue_now = RR;
+                ip->state = PREADY;
+                ready_queue_RR_push(rq_r,ip);
+                printf(">RR\n" );
+              }
+              else {
+                //FCFS
+                queue_now = FCFS;
+                ip->state = PREADY;
+                ready_queue_FCFS_push(rq_f,ip);
+                printf(">FCFS\n" );
+              }
+              // e->p->state = PFINISH;
+              if(CPU == IDLE) {
+                printf("EXEC*****\n" );
+                printf("CPUtime: %d\n", CPUtime );
+                if(ready_queue_RR_size(rq_r) != 0) {
+                  //RR
+                  printf("From RR\n" );
+                  Process* p = ready_queue_RR_pop(rq_r);
+                  process_print(p);
+                  if(p->cpu_burst <= QUANTUM) {
+                    //Smaller than quantum
+                    printf("Small\n" );
+                    CPUtime += e->p->cpu_burst;
+                    p->wait_time = (CPUtime - p->time) - p->saved_burst;
+                    p->state = PFINISH;
+                    p->cpu_burst =0;
+                    // Event* en = event_initialize_process(CPUtime,p);
+                    // en->type = ECPUBURSTCOMPLETION;
+                    printf("execution less than 1q (cpuburst)\n" );
+                    // print_event(en);
+                    // event_heap_push(eh,en);
+                  }
+                  else {
+                    //1 QUANTUM
+                    printf("1 Quantum\n" );
+                    CPUtime += QUANTUM;
+                    p->wait_time = (CPUtime - p->time) - p->saved_burst;
+                    p->state = PREADY;
+                    p->cpu_burst -= QUANTUM;
+                    Event* en = event_initialize_process(CPUtime,p);
+                    en->type = ETIMEREXPIRED;
+                    printf("After Completion execution 1q (cpub)\n" );
+                    print_event(en);
+                    event_heap_push(eh,en);
+                  }
+                }
+                else if(ready_queue_RR_size(rq_r) == 0 && ready_queue_FCFS_size(rq_f) != 0) {
+                  //FCFS
+                  printf("From FCFS\n" );
+                  Process* p = ready_queue_FCFS_pop(rq_f);
+                  process_print(p);
                   p->wait_time = p->wait_time + (CPUtime - p->time);
                   CPUtime += p->cpu_burst;
+                  p->cpu_burst = 0;
                   p->state = PFINISH;
-                  Event* en = event_initialize_process(CPUtime,p);
-                  en->type = ECPUBURSTCOMPLETION;
-                  event_heap_push(eh,en);
-                }
-                else {
-                  //1 QUANTUM
-                  printf("1 Quantum\n" );
-                  p->wait_time = p->wait_time + (CPUtime - p->time);
-                  CPUtime += QUANTUM;
-                  p->state = PREADY;
-                  e->p->cpu_burst -= QUANTUM;
-                  Event* en = event_initialize_process(CPUtime,e->p);
-                  en->type = ETIMEREXPIRED;
-                  event_heap_push(eh,en);
+                  if(p->cpu_burst != 0 ) {
+                    Event* en = event_initialize_process(CPUtime,p);
+                    en->type = ECPUBURSTCOMPLETION;
+                    printf("fcfs in cpub\n" );
+                    event_heap_push(eh,en);
+                    print_event(en);
+                  }
                 }
               }
-              else if(ready_queue_RR_size(rq_r) == 0 && ready_queue_FCFS_size(rq_f) != 0) {
-                //FCFS
-                printf("From FCFS\n" );
-                Process* p = ready_queue_FCFS_pop(rq_f);
-                process_print(p);
-                p->wait_time = e->p->wait_time + (CPUtime - p->time);
-                CPUtime += p->cpu_burst;
-                p->state = PFINISH;
-                Event* en = event_initialize_process(CPUtime,p);
-                en->type = ECPUBURSTCOMPLETION;
-                event_heap_push(eh,en);
-              }
+              printf("CPUtime: %d\n", CPUtime );
             }
             break;
           }
           case ETIMEREXPIRED: {
+            printf("expir\n" );
             print_event(e);
-            e->p->state = PREADY;
-            ready_queue_RR_push(rq_r,e->p);
+            if(e->p->cpu_burst != 0){
+              e->type = ECPUBURSTCOMPLETION;
+              event_heap_push(eh,e);
+              e->p->state = PREADY;
+            }
+            printf("CPUtime: %d\n", CPUtime );
             break;
           }
           default: {
             //Incase of failure
             abort();
+            break;
           }
-          free(e);
+          //here
         }
       }
+      // free(e);
       // Break from the Multiqueue section
       break;
     }
     // End of case 2
   }
-
+  printf("CPUTIME: %d\n", CPUtime );
   float sum = 0,total = 0;
   total = pt->current_size;
   while(pt->current_size != 0) {

@@ -13,6 +13,7 @@ int pid;
 Process_Type state;
 int time;         //Arrival time
 int cpu_burst;
+int saved_burst;
 int wait_time;
 char* scheduling_policy;
 int time_quantum;

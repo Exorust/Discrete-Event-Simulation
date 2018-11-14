@@ -16,6 +16,7 @@ Process* process_initialize(int arrt,int burst) {
 
   p->time = arrt;
   p->cpu_burst = burst;
+  p->saved_burst = burst;
   return p;
 }
 
@@ -26,6 +27,7 @@ void process_print(Process* p) {
   printf(" state %c", p->state);
   printf(" arrival_time %d", p->time);
   printf(" cpu_burst: %d", p->cpu_burst);
+  printf(" saved_burst: %d", p->saved_burst);
   printf(" wait_time %d", p->wait_time);
   // printf("scheduling_policy %c", *(p->scheduling_policy));
   printf(" time_quantum: %d", p->time_quantum);
