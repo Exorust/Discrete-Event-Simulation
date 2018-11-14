@@ -7,7 +7,8 @@ typedef enum Event_Type_t {
   EDEFAULT,
   EARRIVAL,
   ECPUBURSTCOMPLETION,
-  ETIMEREXPIRED
+  ETIMEREXPIRED,
+  EFCFS
 }Event_Type;
 
 typedef struct Event_t {

@@ -187,10 +187,16 @@ int main(int argc, char const *argv[]) {
             }
             else {
               //FCFS
-              queue_now = FCFS;
+              // queue_now = FCFS;
+              // e->p->state = PREADY;
+              // ready_queue_FCFS_push(rq_f,e->p);
+              // printf(">FCFS\n" );
               e->p->state = PREADY;
-              ready_queue_FCFS_push(rq_f,e->p);
-              printf(">FCFS\n" );
+              Event* en = event_initialize_process(CPUtime,e->p);
+              en->type = EFCFS;
+              printf("fcfs event gen\n" );
+              event_heap_push(eh,en);
+              print_event(en);
             }
             if(CPU == IDLE) {
               printf("EXEC*****\n" );
@@ -226,23 +232,37 @@ int main(int argc, char const *argv[]) {
                   event_heap_push(eh,en);
                 }
               }
-              else if(ready_queue_RR_size(rq_r) == 0 && ready_queue_FCFS_size(rq_f) != 0) {
-                //FCFS
-                printf("From FCFS\n" );
-                Process* p = ready_queue_FCFS_pop(rq_f);
-                process_print(p);
-                p->wait_time = p->wait_time + (CPUtime - p->time);
-                CPUtime += p->cpu_burst;
-                p->cpu_burst = 0;
-                p->state = PFINISH;
-                if(p->cpu_burst != 0 ) {
-                  Event* en = event_initialize_process(CPUtime,p);
-                  en->type = ECPUBURSTCOMPLETION;
-                  printf("fcfs in cpub\n" );
-                  event_heap_push(eh,en);
-                  print_event(en);
-                }
-              }
+              // else if(ready_queue_RR_size(rq_r) == 0 && ready_queue_FCFS_size(rq_f) != 0) {
+              //   //FCFS
+              //   printf("From FCFS\n" );
+              //   Process* p = ready_queue_FCFS_top(rq_f);
+              //   // process_print(p);
+              //   // p->wait_time = p->wait_time + (CPUtime - p->time);
+              //   // CPUtime += 1;
+              //   // p->cpu_burst -= 1;
+              //   // p->state = PFINISH;
+              //   printf("Adding within FCFS exec  \n" );
+              //   for(i=0;i<pt_input->current_size;i++) {
+              //     if((pt_input->proc_arr)[i]->time <= CPUtime) {
+              //       Process* p = process_table_pop(pt_input,i);
+              //       Event* e = event_initialize_process(p->time,p);
+              //       e->type = EARRIVAL;
+              //       printf("\n");
+              //       print_event(e);
+              //       event_heap_push(eh,e);
+              //     }
+              //   }
+              //   printf("Finish Adding!! \n" );
+              //   if(p->cpu_burst != 0 ) {
+              //     p->state = PREADY;
+              //     Event* en = event_initialize_process(CPUtime,p);
+              //     en->type = EFCFS;
+              //     printf("fcfs in cpub\n" );
+              //     event_heap_push(eh,en);
+              //     // ready_queue_FCFS_push(rq_f,p);
+              //     print_event(en);
+              //   }
+              // }
             }
             printf("CPUtime: %d\n", CPUtime );
             break;
@@ -263,10 +283,11 @@ int main(int argc, char const *argv[]) {
               }
               else {
                 //FCFS
-                queue_now = FCFS;
-                ip->state = PREADY;
-                ready_queue_FCFS_push(rq_f,ip);
-                printf(">FCFS\n" );
+                abort(); // NOT HAPPENING
+                // queue_now = FCFS;
+                // ip->state = PREADY;
+                // ready_queue_FCFS_push(rq_f,ip);
+                // printf(">FCFS\n" );
               }
               // e->p->state = PFINISH;
               if(CPU == IDLE) {
@@ -304,23 +325,37 @@ int main(int argc, char const *argv[]) {
                     event_heap_push(eh,en);
                   }
                 }
-                else if(ready_queue_RR_size(rq_r) == 0 && ready_queue_FCFS_size(rq_f) != 0) {
-                  //FCFS
-                  printf("From FCFS\n" );
-                  Process* p = ready_queue_FCFS_pop(rq_f);
-                  process_print(p);
-                  p->wait_time = p->wait_time + (CPUtime - p->time);
-                  CPUtime += p->cpu_burst;
-                  p->cpu_burst = 0;
-                  p->state = PFINISH;
-                  if(p->cpu_burst != 0 ) {
-                    Event* en = event_initialize_process(CPUtime,p);
-                    en->type = ECPUBURSTCOMPLETION;
-                    printf("fcfs in cpub\n" );
-                    event_heap_push(eh,en);
-                    print_event(en);
-                  }
-                }
+                // else if(ready_queue_RR_size(rq_r) == 0 && ready_queue_FCFS_size(rq_f) != 0) {
+                //   //FCFS
+                //   printf("From FCFS\n" );
+                //   Process* p = ready_queue_FCFS_top(rq_f);
+                //   // process_print(p);
+                //   // p->wait_time = p->wait_time + (CPUtime - p->time);
+                //   // CPUtime += 1;
+                //   // p->cpu_burst -= 1;
+                //   // p->state = PFINISH;
+                //   printf("Adding within FCFS exec  \n" );
+                //   for(i=0;i<pt_input->current_size;i++) {
+                //     if((pt_input->proc_arr)[i]->time <= CPUtime) {
+                //       Process* p = process_table_pop(pt_input,i);
+                //       Event* e = event_initialize_process(p->time,p);
+                //       e->type = EARRIVAL;
+                //       printf("\n");
+                //       print_event(e);
+                //       event_heap_push(eh,e);
+                //     }
+                //   }
+                //   printf("Finish Adding!! \n" );
+                //   if(p->cpu_burst != 0 ) {
+                //     p->state = PREADY;
+                //     Event* en = event_initialize_process(CPUtime,p);
+                //     en->type = EFCFS;
+                //     printf("fcfs in cpub\n" );
+                //     event_heap_push(eh,en);
+                //     // ready_queue_FCFS_push(rq_f,p);
+                //     print_event(en);
+                //   }
+                // }
               }
               printf("CPUtime: %d\n", CPUtime );
             }
@@ -333,6 +368,85 @@ int main(int argc, char const *argv[]) {
               e->type = ECPUBURSTCOMPLETION;
               event_heap_push(eh,e);
               e->p->state = PREADY;
+            }
+            printf("CPUtime: %d\n", CPUtime );
+            break;
+          }
+          case EFCFS: {
+            printf("event fcfs.\n" );
+            print_event(e);
+            if(e->time >= CPUtime) {
+              //Run the fcfs
+              printf("EXEC*****\n" );
+              printf("CPUtime: %d\n", CPUtime );
+              if(ready_queue_RR_size(rq_r) == 0 && ready_queue_FCFS_size(rq_f) != 0) {
+                //FCFS
+                printf(">From FCFS\n" );
+                Process* p = ready_queue_FCFS_pop(rq_f);
+                process_print(p);
+                CPUtime += 1;
+                p->wait_time = (CPUtime - p->time) - p->saved_burst;
+                p->cpu_burst -= 1;
+                p->state = PFINISH;
+                // if(p->cpu_burst != 0 ) {
+                //   p->state = PREADY;
+                //   Event* en = event_initialize_process(CPUtime,p);
+                //   en->type = EFCFS;
+                //   printf("fcfs in cpub\n" );
+                //   event_heap_push(eh,en);
+                //   ready_queue_FCFS_push(rq_f,p);
+                //   print_event(en);
+                // }
+              }
+              else {
+                printf("FAILED HERE\n" );
+              }
+            }
+            else{
+              //run anyone else. and reschedule it
+              printf("EXEC*****\n" );
+              printf("CPUtime: %d\n", CPUtime );
+              if(ready_queue_RR_size(rq_r) != 0) {
+                //RR
+                printf("From RR\n" );
+                Process* p = ready_queue_RR_pop(rq_r);
+                process_print(p);
+                if(p->cpu_burst <= QUANTUM) {
+                  //Smaller than quantum
+                  printf("Small\n" );
+                  CPUtime += e->p->cpu_burst;
+                  p->wait_time = (CPUtime - p->time) - p->saved_burst;
+                  p->state = PFINISH;
+                  Event* en = event_initialize_process(CPUtime,p);
+                  en->type = ECPUBURSTCOMPLETION;
+                  printf("After Completion less than 1q\n" );
+                  print_event(en);
+                  event_heap_push(eh,en);
+                }
+                else {
+                  //1 QUANTUM
+                  printf("1 Quantum\n" );
+                  CPUtime += QUANTUM;
+                  p->wait_time = (CPUtime - p->time) - p->saved_burst;
+                  p->state = PREADY;
+                  p->cpu_burst -= QUANTUM;
+                  Event* en = event_initialize_process(CPUtime,p);
+                  en->type = ETIMEREXPIRED;
+                  printf("After Completion 1 quantum\n" );
+                  print_event(en);
+                  event_heap_push(eh,en);
+                }
+              }
+            }
+            if(e->p->cpu_burst > 0 ) {
+              e->p->state = PREADY;
+              Event* en = event_initialize_process(CPUtime,e->p);
+              en->type = EFCFS;
+              printf("fcfs in cpub\n" );
+              event_heap_push(eh,en);
+              ready_queue_FCFS_push(rq_f,e->p);
+              printf("PUSHING TO FCFS AND MAKE EVENT\n");
+              print_event(en);
             }
             printf("CPUtime: %d\n", CPUtime );
             break;
@@ -357,7 +471,7 @@ int main(int argc, char const *argv[]) {
   while(pt->current_size != 0) {
       Process* p = process_table_pop(pt,0);
       if(p != NULL) {
-        printf("%d\n", p->wait_time );
+        printf("%d,%d: %d\n", p->time, p->saved_burst, p->wait_time );
         sum += p->wait_time;
       }
   }
