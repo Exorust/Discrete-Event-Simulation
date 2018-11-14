@@ -20,7 +20,7 @@ void event_heap_swap(Event_Heap* e, int i,int j) {
   //Swaps two processes in the event queue
   Event* temp = e->heap[i];
   e->heap[i] = e->heap[j];
-  
+
   e->heap[j] = temp;
 }
 void event_heap_minheapify(Event_Heap* e, int i) {
@@ -31,11 +31,11 @@ void event_heap_minheapify(Event_Heap* e, int i) {
   // print_event(e->heap[i]);
   // print_event(e->heap[left]);
   // print_event(e->heap[right]);
-  if(left<=n-1 && e->heap[to_repeat]->time > e->heap[left]->time) {
-    to_repeat = left;
-  }
   if(right<=n-1 && e->heap[to_repeat]->time > e->heap[right]->time) {
     to_repeat = right;
+  }
+  if(left<=n-1 && e->heap[to_repeat]->time > e->heap[left]->time) {
+    to_repeat = left;
   }
   if(to_repeat != i) {
     event_heap_swap(e,i,to_repeat);
@@ -81,6 +81,11 @@ Event* event_heap_top(Event_Heap* e) {
 int event_heap_size(Event_Heap* e) {
   return e->current_size;
 }
+
+// int main() {
+//   Event_Heap* eh = event_heap_initialize();
+//   Event* e =
+// }
 
 // //If needed implement DELETE
 // void event_heap_delete(Event_Heap* e, Event* ev) {

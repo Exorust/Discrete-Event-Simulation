@@ -26,11 +26,11 @@ void ready_queue_FCFS_minheapify(Ready_Queue_FCFS* e, int i) {
   int right = 2*i+2;
   int n = e->current_size;
   int to_repeat = i;
-  if(left<=n-1 && e->heap[to_repeat]->time > e->heap[left]->time) {
-    to_repeat = left;
-  }
   if(right<=n-1 && e->heap[to_repeat]->time > e->heap[right]->time) {
     to_repeat = right;
+  }
+  if(left<=n-1 && e->heap[to_repeat]->time > e->heap[left]->time) {
+    to_repeat = left;
   }
   if(to_repeat != i) {
     ready_queue_FCFS_swap(e,i,to_repeat);
@@ -40,14 +40,12 @@ void ready_queue_FCFS_minheapify(Ready_Queue_FCFS* e, int i) {
 
 void ready_queue_FCFS_build_minheap (Ready_Queue_FCFS* e) {
   int i;
-  int left = 2*i+1;
-  int right = 2*i+2;
   int n = e->current_size;
-  if(i !=  0) {
-    for(i = n/2 ;i >= 0 ;i--) {
-      if(e->heap[left] != NULL || e->heap[right] != NULL) {
-        ready_queue_FCFS_minheapify(e,i) ;
-      }
+  for(i = n/2 ;i >= 0 ;i--) {
+    int left = 2*i+1;
+    int right = 2*i+2;
+    if(e->heap[left] != NULL || e->heap[right] != NULL) {
+      ready_queue_FCFS_minheapify(e,i) ;
     }
   }
 }

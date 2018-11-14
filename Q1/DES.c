@@ -54,24 +54,27 @@ int main(int argc, char const *argv[]) {
       for(i=0;i<pt_input->current_size;i++) {
         if((pt_input->proc_arr)[i]->time <= CPUtime) {
           Process* p = process_table_pop(pt_input,i);
-          Event* e = event_initialize_process(CPUtime,p);
+          Event* e = event_initialize_process(p->time,p);
           e->type = EARRIVAL;
           event_heap_push(eh,e);
         }
       }
       while(event_heap_size(eh) != 0){
+        printf("\n\nWHILE LOOP\n" );
         printf("Size of Process_Table %d\n", pt_input->current_size );
+        printf("ADDDING while CPUtime =%d\n",CPUtime );
         for(i=0;i<pt_input->current_size;i++) {
           if((pt_input->proc_arr)[i]->time <= CPUtime) {
             Process* p = process_table_pop(pt_input,i);
-            Event* e = event_initialize_process(CPUtime,p);
-            printf("ADDDING\n" );
-            print_event(e);
-            printf("==================\n" );
+            i--;
+            Event* e = event_initialize_process(p->time,p);
             e->type = EARRIVAL;
             event_heap_push(eh,e);
+            printf("Size of Process_Table %d\n", pt_input->current_size );
+            print_event(e);
           }
         }
+        printf("==================\n" );
         // The event that is first in the queue
         Event* e = event_heap_pop(eh);
         // printf("%d",e->type);
@@ -87,14 +90,18 @@ int main(int argc, char const *argv[]) {
               //Idle run it
               e->p->wait_time = e->p->wait_time + (CPUtime - e->p->time);
               CPUtime += e->p->cpu_burst;
-              Event* en = event_initialize_process(CPUtime,e->p);
+              Event* en = event_initialize_process(e->p->time,e->p);
               en->type = ECPUBURSTCOMPLETION;
+              printf("Executed: ");
+              print_event(en);
               event_heap_push(eh,en);
             }
             else {
               //Not idle add to ready_queue
               e->p->state = PREADY;
               ready_queue_FCFS_push(rq,e->p);
+              printf("Ready Queue Push" );
+              process_print(e->p);
             }
             break;
           }
@@ -107,6 +114,8 @@ int main(int argc, char const *argv[]) {
               CPUtime += p->cpu_burst;
               Event* en = event_initialize_process(CPUtime,p);
               en->type = ECPUBURSTCOMPLETION;
+              printf("Executed: ");
+              print_event(en);
               event_heap_push(eh,en);
             }
             break;
@@ -134,7 +143,7 @@ int main(int argc, char const *argv[]) {
       for(i=0;i<pt_input->current_size;i++) {
         if((pt_input->proc_arr)[i]->time <= CPUtime) {
           Process* p = process_table_pop(pt_input,i);
-          Event* e = event_initialize_process(CPUtime,p);
+          Event* e = event_initialize_process(p->time,p);
           e->type = EARRIVAL;
           event_heap_push(eh,e);
         }
@@ -143,7 +152,7 @@ int main(int argc, char const *argv[]) {
         for(i=0;i<pt_input->current_size;i++) {
           if((pt_input->proc_arr)[i]->time <= CPUtime) {
             Process* p = process_table_pop(pt_input,i);
-            Event* e = event_initialize_process(CPUtime,p);
+            Event* e = event_initialize_process(p->time,p);
             e->type = EARRIVAL;
             event_heap_push(eh,e);
           }
@@ -179,9 +188,9 @@ int main(int argc, char const *argv[]) {
                 printf("From RR\n" );
                 Process* p = ready_queue_RR_pop(rq_r);
                 process_print(p);
-                printf("Small\n" );
-                if(p->time <= QUANTUM) {
+                if(p->cpu_burst <= QUANTUM) {
                   //Smaller than quantum
+                  printf("Small\n" );
                   p->wait_time = p->wait_time + (CPUtime - p->time);
                   CPUtime += e->p->cpu_burst;
                   p->state = PFINISH;
@@ -225,7 +234,7 @@ int main(int argc, char const *argv[]) {
                 printf("From RR\n" );
                 Process* p = ready_queue_RR_pop(rq_r);
                 process_print(p);
-                if(p->time <= QUANTUM) {
+                if(p->cpu_burst <= QUANTUM) {
                   //Smaller than quantum
                   p->wait_time = p->wait_time + (CPUtime - p->time);
                   CPUtime += p->cpu_burst;
@@ -280,7 +289,7 @@ int main(int argc, char const *argv[]) {
     // End of case 2
   }
 
-  int sum = 0,total;
+  float sum = 0,total = 0;
   total = pt->current_size;
   while(pt->current_size != 0) {
       Process* p = process_table_pop(pt,0);
@@ -289,7 +298,8 @@ int main(int argc, char const *argv[]) {
         sum += p->wait_time;
       }
   }
-  double awt = sum/total;
+  printf("%f %f\n", sum, total );
+  float awt = sum/total;
   printf("\nAWT: %f\n", awt );
 
   return 0;
