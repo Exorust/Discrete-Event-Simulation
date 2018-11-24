@@ -1,3 +1,9 @@
 # OS-Assignment-2
 
-Individually placed in files
+Compilation:
+
+$ bash compile.sh
+
+Running:
+
+$ ./DES.out

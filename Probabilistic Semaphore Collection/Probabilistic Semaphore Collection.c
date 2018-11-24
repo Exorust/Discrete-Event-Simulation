@@ -73,14 +73,14 @@ typedef struct parameters
 }params;
 
 
-/* 
+/*
     mutex based solution:
     ---------------------
-    The solution is an extension to the dining philosopher problem where both forks are necessarily picked up 
-    to eat. 
+    The solution is an extension to the dining philosopher problem where both forks are necessarily picked up
+    to eat.
     1. Exactly one process at a time is allowed from the 8*k process requesting.
-    2. It uses a system inspired by malloc and free functions where the functions resAlloc and resRelease 
-        are used to allocate and reclaim resources with the corresponding probabilities. 
+    2. It uses a system inspired by malloc and free functions where the functions resAlloc and resRelease
+        are used to allocate and reclaim resources with the corresponding probabilities.
     3. If it can't find the resource it needs, it exits because there is a resource underflow.
 */
 
@@ -106,16 +106,21 @@ bool resAlloc(int neededA,int neededB, int neededC, int neededD){
     		pthread_mutex_lock(&mutexForProcesses);
     		puts("A");
     		if(resource_qantity[A] > 0){
-    			resource_qantity[A] --; 
+    			resource_qantity[A] --;
     			pthread_mutex_unlock(&mutexForProcesses);
     			return INT_MAX;
     		}
     		pthread_mutex_unlock(&mutexForProcesses);
     	    pthread_yield();
         }
+				if(resource_qantity[A] > 0){
+    			resource_qantity[A] --;
+    			pthread_mutex_unlock(&mutexForProcesses);
+    			return INT_MAX;
+    		}
 		// pthread_mutex_unlock(&mutexForProcesses);
 		return A;
-    	
+
     }
     else if(resource_qantity[A] <= 0){
         return A;
@@ -129,13 +134,18 @@ bool resAlloc(int neededA,int neededB, int neededC, int neededD){
     		pthread_mutex_lock(&mutexForProcesses);
     		puts("B");
     		if(resource_qantity[B] > 0){
-    			resource_qantity[B] --; 
-    			pthread_mutex_unlock(&mutexForProcesses);
-    			return INT_MAX;
+    			resource_qantity[B] --;
+					pthread_mutex_unlock(&mutexForProcesses);
+					return INT_MAX;
     		}
+    	}
     		pthread_mutex_unlock(&mutexForProcesses);
             pthread_yield();
-    	}
+			if(resource_qantity[B] > 0){
+				resource_qantity[B] --;
+				pthread_mutex_unlock(&mutexForProcesses);
+				return INT_MAX;
+			}
 		// pthread_mutex_unlock(&mutexForProcesses);
 		return B;
     }
@@ -151,13 +161,18 @@ bool resAlloc(int neededA,int neededB, int neededC, int neededD){
     		pthread_mutex_lock(&mutexForProcesses);
     		puts("C");
     		if(resource_qantity[C] > 0){
-    			resource_qantity[C] --; 
+    			resource_qantity[C] --;
     			pthread_mutex_unlock(&mutexForProcesses);
     			return INT_MAX;
     		}
     		pthread_mutex_unlock(&mutexForProcesses);
             pthread_yield();
     	}
+			if(resource_qantity[C] > 0){
+				resource_qantity[C] --;
+				pthread_mutex_unlock(&mutexForProcesses);
+				return INT_MAX;
+			}
 		// pthread_mutex_unlock(&mutexForProcesses);
 		return C;
     }
@@ -173,13 +188,18 @@ bool resAlloc(int neededA,int neededB, int neededC, int neededD){
     		pthread_mutex_lock(&mutexForProcesses);
     		puts("D");
     		if(resource_qantity[D] > 0){
-    			resource_qantity[D] --; 
+    			resource_qantity[D] --;
     			pthread_mutex_unlock(&mutexForProcesses);
     			return INT_MAX;
     		}
     		pthread_mutex_unlock(&mutexForProcesses);
             pthread_yield();
     	}
+			if(resource_qantity[D] > 0){
+				resource_qantity[D] --;
+				pthread_mutex_unlock(&mutexForProcesses);
+				return INT_MAX;
+			}
 		return D;
     }
     else if(resource_qantity[D] <= 0){
@@ -241,8 +261,8 @@ void thread_funciton(void* processParams){
             	runningProcessInstance[processType] = true;
                 printf("finished %d\n\n",processType+1);
                 int hasReleased = resRelease(true,true,true,false);
+								runningProcessInstance[processType] = false;
                 pthread_mutex_unlock(&mutexForProcesses);
-                runningProcessInstance[processType] = false;
                 pthread_yield();
             }
             else{
@@ -250,10 +270,10 @@ void thread_funciton(void* processParams){
                 printf("Resource Underflow Process %d %c\n",processType,resourceUnderflow[res]);
                 exit(0);
             }
-            
+
         }
         break;
-        
+
         case 1:
         for(i = 0; i < k; i++){
             pthread_mutex_lock(&mutexForProcesses);
@@ -268,8 +288,8 @@ void thread_funciton(void* processParams){
             	runningProcessInstance[processType] = true;
                 printf("finished %d\n\n",processType+1);
                 int hasReleased = resRelease(false,true,true,true);
+								runningProcessInstance[processType] = false;
                 pthread_mutex_unlock(&mutexForProcesses);
-                runningProcessInstance[processType] = false;
                 pthread_yield();
             }
             else{
@@ -277,11 +297,11 @@ void thread_funciton(void* processParams){
                 printf("Resource Underflow Process %d %c\n",processType,resourceUnderflow[res]);
                 exit(0);
             }
-            
+
         }
 
         break;
-        
+
         case 2:
         for(i = 0; i < k; i++){
             pthread_mutex_lock(&mutexForProcesses);
@@ -296,8 +316,8 @@ void thread_funciton(void* processParams){
             	runningProcessInstance[processType] = true;
                 printf("finished %d\n\n",processType+1);
                 int hasReleased = resRelease(true,false,true,true);
+								runningProcessInstance[processType] = false;
                 pthread_mutex_unlock(&mutexForProcesses);
-                runningProcessInstance[processType] = false;
                 pthread_yield();
             }
             else{
@@ -305,10 +325,10 @@ void thread_funciton(void* processParams){
                 printf("Resource Underflow Process %d %c\n",processType,resourceUnderflow[res]);
                 exit(0);
             }
-            
+
         }
         break;
-        
+
         case 3:
         for(i = 0; i < k; i++){
             pthread_mutex_lock(&mutexForProcesses);
@@ -323,8 +343,8 @@ void thread_funciton(void* processParams){
             	runningProcessInstance[processType] = true;
                 printf("finished %d\n\n",processType+1);
                 int hasReleased = resRelease(true,true,false,true);
+								runningProcessInstance[processType] = false;
                 pthread_mutex_unlock(&mutexForProcesses);
-                runningProcessInstance[processType] = false;
                 pthread_yield();
             }
             else{
@@ -332,11 +352,11 @@ void thread_funciton(void* processParams){
                 printf("Resource Underflow Process %d %c\n",processType,resourceUnderflow[res]);
                 exit(0);
             }
-            
+
         }
 
         break;
-        
+
         case 4:
         for(i = 0; i < k; i++){
             pthread_mutex_lock(&mutexForProcesses);
@@ -351,8 +371,8 @@ void thread_funciton(void* processParams){
             	runningProcessInstance[processType] = true;
                 printf("finished process %d\n\n",processType+1);
                 int hasReleased = resRelease(true,false,false,false);
+								runningProcessInstance[processType] = false;
                 pthread_mutex_unlock(&mutexForProcesses);
-                runningProcessInstance[processType] = false;
                 pthread_yield();
             }
             else{
@@ -360,10 +380,10 @@ void thread_funciton(void* processParams){
                 printf("Resource Underflow Process %d %c\n",processType,resourceUnderflow[res]);
                 exit(0);
             }
-            
+
         }
         break;
-        
+
         case 5:
         for(i = 0; i < k; i++){
             pthread_mutex_lock(&mutexForProcesses);
@@ -378,8 +398,8 @@ void thread_funciton(void* processParams){
             	runningProcessInstance[processType] = true;
                 printf("finished process %d\n\n",processType+1);
                 int hasReleased = resRelease(false,true,false,false);
+								runningProcessInstance[processType] = false;
                 pthread_mutex_unlock(&mutexForProcesses);
-                runningProcessInstance[processType] = false;
                 pthread_yield();
             }
             else{
@@ -387,11 +407,11 @@ void thread_funciton(void* processParams){
                 printf("Resource Underflow Process %d %c\n",processType,resourceUnderflow[res]);
                 exit(0);
             }
-            
+
         }
-    
+
         break;
-        
+
         case 6:
         for(i = 0; i < k; i++){
             pthread_mutex_lock(&mutexForProcesses);
@@ -406,8 +426,8 @@ void thread_funciton(void* processParams){
             	runningProcessInstance[processType] = true;
                 printf("finished process %d\n\n",processType+1);
                 int hasReleased = resRelease(false,false,true,false);
+								runningProcessInstance[processType] = false;
                 pthread_mutex_unlock(&mutexForProcesses);
-                runningProcessInstance[processType] = false;
                 pthread_yield();
             }
             else{
@@ -415,18 +435,18 @@ void thread_funciton(void* processParams){
                 printf("Resource Underflow Process %d %c\n",processType,resourceUnderflow[res]);
                 exit(0);
             }
-            
+
         }
 
         break;
-        
+
         case 7:
         for(i = 0; i < k; i++){
             pthread_mutex_lock(&mutexForProcesses);
             printf("\nProcess Entered: %d\n",processType+1);
             int res = resAlloc(true,false,false,true);
             if(res  == INT_MAX){
-                printf("allocated resources to process %d\n",processType+1);    
+                printf("allocated resources to process %d\n",processType+1);
             	pthread_mutex_unlock(&mutexForProcesses);
             	pthread_yield();
 				pthread_mutex_lock(&mutexForProcesses);
@@ -434,8 +454,8 @@ void thread_funciton(void* processParams){
             	runningProcessInstance[processType] = true;
                 printf("finished process %d\n\n",processType+1);
                 int hasReleased = resRelease(false,false,false,true);
+								runningProcessInstance[processType] = false;
                 pthread_mutex_unlock(&mutexForProcesses);
-                runningProcessInstance[processType] = false;
                 pthread_yield();
             }
             else{
@@ -443,7 +463,7 @@ void thread_funciton(void* processParams){
                 printf("Resource Underflow Process %d %c\n",processType,resourceUnderflow[res]);
                 exit(0);
             }
-            
+
         }
         break;
     }
@@ -451,14 +471,14 @@ void thread_funciton(void* processParams){
 }
 
 int main(){
-    // random values threshold for 
+    // random values threshold for
     thresholds[0] = 2*(long long)(RAND_MAX/3);
     thresholds[1] = 3*(long long)(RAND_MAX/4);
     thresholds[2] = 3*(long long)(RAND_MAX/5);
     thresholds[3] = 2*(long long)(RAND_MAX/3);
     puts("enter k");
     scanf("%d",&k);
-    puts("enter resources"); 
+    puts("enter resources");
     int i,j;
     for(i = 0; i < 4; i++){
         scanf("%d",&resource_qantity[i]);
