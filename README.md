@@ -1,4 +1,4 @@
-# OS-Assignment-2
+# Discrete Event Simulation
 
 Compilation:
 
