@@ -1,7 +1,5 @@
 # Discrete Event Simulation
 
-
-One Paragraph of project description goes here
 A discrete event simulator which simulates an Operating system scheduling processes in First Come Fist Serve (FCFS), or in Round Robin Queue (RR). We keep track of:
   - Arrival Time:       Time at which the process arrives in the ready queue.
   - Completion Time:    Time at which process completes its execution.
